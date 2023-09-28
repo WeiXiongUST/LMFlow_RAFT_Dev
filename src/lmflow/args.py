@@ -22,6 +22,7 @@ from transformers import (
     TrainingArguments,
 )
 
+
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_CAUSAL_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
 
@@ -151,6 +152,14 @@ class ModelArguments:
             )
         },
     )
+    trust_remote_code : bool = field(
+        default=False,
+        metadata={
+            "help": (
+                "Whether to trust remote code when loading model."
+            )
+        },
+    )
     torch_dtype: Optional[str] = field(
         default=None,
         metadata={
@@ -164,6 +173,24 @@ class ModelArguments:
     use_lora: bool = field(
         default=False,
         metadata={"help": "Whether to lora."},
+    )
+    use_qlora: bool = field(
+        default=False,
+        metadata={"help": "Whether to use qlora."},
+    )
+    bits: int = field(
+        default=4,
+        metadata={"help": "The number of bits for quantization.",
+                  "choices": [4, 8],},
+    )
+    quant_type: str = field(
+        default='nf4',
+        metadata={"help": "The quantization type for quantization.",
+                  "choices": ["nf4", "fp4"],},
+    )
+    double_quant: bool = field(
+        default=True,
+        metadata={"help": "Whether to use double quantization."},
     )
     lora_r: int = field(
         default=8,
@@ -258,9 +285,29 @@ class VisModelArguments(ModelArguments):
         default=False,
         metadata={"help": "flag for the model from huggingface or not"}
     )
-    checkpoint_path: str = field(
+    pretrained_language_projection_path: str = field(
         default=None,
-        metadata={"help": "path for model checkpoint"}
+        metadata={"help": "path for model pretrained_language_projection_path"}
+    )
+    custom_vision_model: bool = field(
+        default=False,
+        metadata={"help": "flag for the model from huggingface or not"}
+    )
+    image_encoder_name_or_path: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": (
+                "The name or path of the image encoder to use."
+            )
+        },
+    )
+    qformer_name_or_path: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": (
+                "llm model in multi-modality model"
+            )
+        },
     )
     llm_model_name_or_path: Optional[str] = field(
         default=None,
@@ -278,8 +325,26 @@ class VisModelArguments(ModelArguments):
         default=None,
         metadata={"help": "Path to prompt cache."},
     )
-
-
+    llava_loading: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Whether to load module by module from pretrained model."},
+    )
+    with_qformer: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Whether to use qformer."},
+    )
+    vision_select_layer: Optional[int] = field(
+        default=-2,
+        metadata={"help": "Which layer to select in vision model."},
+    )
+    llava_pretrain_model_path: Optional[str] = field(
+        default=None,
+        metadata={"help": "Path to llava pretrained model."},
+    )
+    save_pretrain_model_path: Optional[str] = field(
+        default=None,
+        metadata={"help": "Path to pretrained model."},
+    )
 
 @dataclass
 class DatasetArguments:
@@ -444,12 +509,49 @@ class DatasetArguments:
 
 
 @dataclass
+class MultiModalDatasetArguments(DatasetArguments):
+    image_folder: Optional[str] = field(
+        default=None, metadata={"help": "The folder of the image file."}
+    )
+    image_aspect_ratio: Optional[str] = field(
+        default="pad", metadata={"help": "The ratio type"}
+    )
+    is_multimodal: Optional[bool] = field(
+        default=True, metadata={"help": "Flag for the modality type."}
+    )
+    use_image_start_end: Optional[bool] = field(
+        default=True, metadata={"help": "Flag for the modality type."}
+    )
+    sep_style: Optional[str] = field(
+        default="plain", metadata={"help": "Sep style in multi_modality dataset."}
+    )
+
+
+
+@dataclass
 class FinetunerArguments(TrainingArguments):
     """
     Adapt transformers.TrainingArguments
     """
     eval_dataset_path: Optional[str] = field(
         default=None, metadata={"help": "The path of the eval dataset to use."}
+    )
+    remove_unused_columns: Optional[bool] = field(
+        default=False,
+        metadata={
+            "help": "whether to remove the unused columns in collate fn"}
+    )
+    finetune_part: Optional[str] = field(
+        default="language_projection",
+        metadata={
+            "help": "the module to finetune."
+        }
+    )
+    save_language_projection: Optional[str] = field(
+        default=False,
+        metadata={
+            "help": "whether to save language projection layer in multi-modal models."
+        }
     )
 
 
@@ -768,6 +870,56 @@ class RaftAlignerArguments(TrainingArguments):
                 " top means that we rank the samples globally regardless of the prompts"
                 " local means that we only rank the samples with the same prompt"
             ),
+        },
+    )
+    mode: Optional[str] = field(
+        default="xxx",
+        metadata={
+            "help": (
+                "{mode} is either raft_get_samples or raft_get_rewards"
+            ),
+        },
+    )
+    raft_random_seed: Optional[int] = field(
+        default=1,
+        metadata={
+            "help": (
+                "{raft_random_seed} is the random seed, which must be set to be different for different iterations of raft"
+            ),
+        },
+    )
+    raft_infer_set: Optional[str] = field(
+        default="xxx",
+        metadata={
+            "help": (
+                "{raft_infer_set} is the path to store the inferred set"
+            ),
+        },
+    )
+    raft_filtered_set: Optional[str] = field(
+        default="yyy",
+        metadata={
+            "help": (
+                "{raft_filtered_set} is the path to store the filtered set"
+            ),
+        },
+    )
+    raft_exp_dir: Optional[str] = field(
+        default="output_models/iter_raft_align",
+        metadata={
+            "help": ("main directory to run raft experiments"),
+        },
+    )
+    iter_id: Optional[int] = field(
+        default=0,
+        metadata={
+            "help": ("the global iter id of raft"),
+        },
+    )
+    output_temperature: Optional[float] = field(
+        default=1.0,
+        metadata={
+            "help": ("the sampling temperature"),
         },
     )
 

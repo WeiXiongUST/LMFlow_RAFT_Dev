@@ -1,3 +1,7 @@
+
+
+
+
 #!/usr/bin/env python
 # coding=utf-8
 # Copyright 2023 Statistics and Machine Learning Research Group at HKUST. All rights reserved.
@@ -9,7 +13,7 @@ import sys
 sys.path.remove(os.path.abspath(os.path.dirname(sys.argv[0])))
 from dataclasses import dataclass, field
 from typing import Optional
-
+import torch
 from transformers import HfArgumentParser, pipeline, AutoTokenizer
 
 from lmflow.args import (
@@ -22,6 +26,7 @@ from lmflow.datasets.dataset import Dataset
 from lmflow.models.auto_model import AutoModel
 from lmflow.pipeline.auto_pipeline import AutoPipeline
 
+import warnings
 
 @dataclass
 class RewardArguments:
@@ -35,7 +40,7 @@ class RewardArguments:
         },
     )
     reward_model_or_path: Optional[str] = field(
-        default="weqweasdas/hh_rlhf_rm",
+        default=None,
         metadata={
             "help": (
                 "reward model name (huggingface) or its path"
@@ -59,23 +64,20 @@ class RewardArguments:
 
 
 def get_reward_function(reward_args, pipeline_args):
+    if reward_args.reward_model_or_path is None:
+        warnings.warn("No reward model is provided.")
+        return None
     args = reward_args
     reward_type = args.reward_type
 
     if reward_type == "hf_pipeline":
-
-        # GPT-2 tokenizer has a pad token, but it is not eos_token by default. We need to set it to eos_token.
-        # only for this model.
-        rm_tokenizer = AutoTokenizer.from_pretrained(reward_args.reward_model_or_path)
-        rm_tokenizer.pad_token = rm_tokenizer.eos_token
-        rm_tokenizer.pad_token_id = rm_tokenizer.eos_token_id
-        rm_tokenizer.padding_side = "left"
-        
+        rm_tokenizer = AutoTokenizer.from_pretrained(reward_args.reward_model_or_path)        
         hf_pipe = pipeline(
             reward_args.reward_task,
             model=reward_args.reward_model_or_path,
             device=f"cuda:{pipeline_args.local_rank}",
-            tokenizer=rm_tokenizer
+            tokenizer=rm_tokenizer,
+                        model_kwargs={"torch_dtype": torch.bfloat16}
         )
         def reward_func(dataset: Dataset):
             if dataset.type != "text_only":
@@ -106,7 +108,6 @@ def get_reward_function(reward_args, pipeline_args):
         return reward_func
     else:
         raise NotImplementedError("unsupported reward type \"{reward_type}\"")
-
 
 def main():
 	# Parses arguments

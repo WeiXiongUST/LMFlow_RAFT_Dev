@@ -107,7 +107,7 @@ class Dataset:
                 use_auth_token=None,
             )
             self.backend_dataset = raw_dataset
-            self._check_data_format()
+            #self._check_data_format()
         elif backend == "json":
             # TODO (@Jiachun)
             pass
@@ -229,7 +229,7 @@ class Dataset:
                     f" follows:\n"
                     f"    {DATASET_DESCRIPTION_MAP[self.type]}"
                 )
-            self._check_data_format()
+            #self._check_data_format()
 
             return self
         elif self.backend == "dict":

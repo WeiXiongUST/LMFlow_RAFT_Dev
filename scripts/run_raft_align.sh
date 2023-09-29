@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # The total iteration of raft
-raft_num_iteration=6
+raft_num_iteration=15
 
 
-base_dir="/home/usr/raft/LMFlow_RAFT_Dev/output_models/raft_test"
+base_dir="./output_models/raft_exp"
 mkdir $base_dir
 # You should edit the sft model dir accordingly
-sft_model=gpt2
+sft_model="gpt2"
 reward_model="weqweasdas/hh_rlhf_rm_open_llama_3b"
 
 x=0

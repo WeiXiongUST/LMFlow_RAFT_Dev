@@ -13,10 +13,7 @@ project_dir=$(cd "$(dirname $0)"/..; pwd)
 output_dir=${project_dir}/output_models/${exp_id}
 log_dir=${project_dir}/log/${exp_id}
 
-dataset_path=${project_dir}/data/hh_rlhf/rm/hh_rlhf_rm_training.json
-if [ ! -d data/hh_rlhf ]; then
-  cd data && ./download.sh hh_rlhf && cd -
-fi
+dataset_path=${project_dir}/data/hh_rlhf/rm/hh_rlhf_rm_data.json
 
 mkdir -p ${output_dir} ${log_dir}
 

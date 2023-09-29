@@ -23,69 +23,19 @@
 [![slack badge](https://img.shields.io/badge/Slack-Join-blueviolet?logo=slack&amp)](https://join.slack.com/t/lmflow/shared_invite/zt-1wju9nicy-woXbNtS~5MavHSAtiMxmxQ)
 [![WeChat badge](https://img.shields.io/badge/WeChat-Join-brightgreen?logo=wechat&amp)](https://s1.ax1x.com/2023/08/06/pPAQTPI.jpg)
 
-An extensible, convenient, and efficient toolbox for finetuning large machine learning models, designed to be user-friendly, speedy and reliable, and accessible to the entire community.
+This is a sub branch of LMFlow, used to present an implementation of RAFT with separate stages, in the sense that we will implement inference, reward ranking, and finetuning separately, so that as long as you can finetune the model, you might leverage RAFT to align your model.
 
 <p align="center" width="100%">
 <img src="assets/features.png" alt="LMFlow-features" style="width: 100%; min-width: 300px; display: block; margin: auto;">
 </p>
 
 
-## Latest News
-* [2023-08-07] Support [Flash Attention-2](https://crfm.stanford.edu/2023/07/17/flash2.html). Check out [flash_attention](https://github.com/OptimalScale/LMFlow/blob/main/readme/flash_attn2.md) for more details.
-* [2023-08-02] Support [Llama2](https://ai.meta.com/llama/), [ChatGLM2](https://huggingface.co/THUDM/chatglm2-6b), and [Baichuan](https://huggingface.co/baichuan-inc/Baichuan-7B) models.
-* [2023-07-23] :rocket: [LMFlow multimodal chatbot](https://github.com/OptimalScale/LMFlow/blob/main/scripts/run_vis_chatbot_gradio_minigpt4.sh) is now available! Support multimodal inputs of images and texts. [Online Demo](http://multimodal.lmflow.online) is also provided (We hold the service on a single GPU, hence one may experience "queuing" or "application busy" sometimes when multiple users are accessing at the same time, please wait and attempt again later when such event happens) :rocket: ![image](https://github.com/OptimalScale/LMFlow/blob/rpan-vision-encoder/assets/multimodal-chatbot-demo.gif)
-* [2023-06-22]  [LMFlow paper](https://arxiv.org/abs/2306.12420) is out! Check out our implementation details at https://arxiv.org/abs/2306.12420
-* [2023-06-16] Our finetuned Robin-33B-V2 scored an impressive 64.1 on the Huggingface LLM leaderboard in our offline evaluation, outperforming major open-source LLMs! All checkpoints (7B, 13B, 33B, and 65B) are [released](https://huggingface.co/OptimalScale)! Checkout the performance [here](https://medium.com/@hkust.ml/robin-v2-launches-achieves-unparalleled-performance-on-openllm-4f6886e822c1).
-* [2023-06-07] LMFlow is now officially available on PyPI! Install it with `pip install lmflow-finetune`!
-* [2023-05-30] Release [Robin-13B-v2](https://huggingface.co/OptimalScale/robin-13b-v2-delta) and [Robin-33B-v2](https://huggingface.co/OptimalScale/robin-33b-v2-delta)!
-* [2023-05-15] Release [LMFlow-data](http://lmflow.org:5000/lmflow_data.tar.gz), the training dataset of Robin-7B-v2. A new [test data](http://lmflow.org:5000/lmflow_chat_en_dialog_multiturn_single_nll_text2text.tar.gz) is also released.
-* [2023-05-09] Release [Robin-7B-v2](http://lmflow.org:5000/robin-7b-v2-delta.tar.gz), achieving competitive performance on chitchat, commonsense reasoning and instruction-following tasks. Refer to our [comprehensive study](https://medium.com/@hkust.ml/lmflow-benchmark-an-automatic-evaluation-framework-for-open-source-llms-ef5c6f142418).
-
-
-<details> <summary>More news...</summary>
-
-* [2023-05-08] Release [LMFlow Benchmark](https://medium.com/@hkust.ml/lmflow-benchmark-an-automatic-evaluation-framework-for-open-source-llms-ef5c6f142418), an automatic evaluation framework for open-source chat-style LLMs. [Benchmark results](https://docs.google.com/spreadsheets/d/1JYh4_pxNzmNA9I0YM2epgRA7VXBIeIGS64gPJBg5NHA/edit#gid=0) on 31 popular models are reported. [Participate in LMFlow Benchmark](https://github.com/OptimalScale/LMFlow#33-lmflow-benchmark).
-* [2023-04-21] Release [Robin-7B](http://lmflow.org:5000/robin-7b.tar.gz) (based on LLaMA-7B), and two models for commercial use: Parakeets-2.7B (based on GPT-NEO-2.7B) and Cokatoo-7B (based on StableLM-7B) [Download here](https://github.com/OptimalScale/LMFlow/tree/main#model-zoo)
-* [2023-04-15] Inference: Support streaming output and ChatGLM.
-* [2023-04-10] We propose a new alignment algorithm: [Reward rAnked FineTuning (RAFT)](https://optimalscale.github.io/LMFlow/examples/raft.html), which is more efficient than conventional (PPO-based) RLHF. [[Paper](https://arxiv.org/abs/2304.06767)]
-* [2023-04-02] [Web service](https://lmflow.com/) is online!
-* [2023-04-01] Release three instruction-tuned checkpoints and three medical checkpoints in [model zoo](https://github.com/OptimalScale/LMFlow#model-zoo): LLaMA-7B-tuned, LLaMA-13B-tuned, LLaMA-33B-tuned, LLaMA-7B-medical, LLaMA-13B-medical, and LLaMA-33B-medical.
-* [2023-03-27] Support full tuning and lora tuning for all decoder models.
-* [2023-03-27] [Tasked tuned model beats ChatGPT on medical domain](https://github.com/OptimalScale/LMFlow#model-performance).
-* [2023-03-27] Release code and checkpoints - [version 0.0.1](https://optimalscale.github.io/LMFlow/)! [Our tasked-tuned model beats ChatGPT on medical domain](https://github.com/OptimalScale/LMFlow#model-performance).
-</details>
-
-
-## Table of Contents
-
-
-* [Quick Start](#quick-start)
-  * [Setup](#setup)
-  * [Prepare Dataset](#prepare-dataset)
-  * [Finetuning](#finetuning-full)
-  * [Inference](#inference)
-  * [Deployment](#deployment)
-  * [Evaluation](#evaluation)
-* [Supported Features](#supported-features)
-  * [Finetune Acceleration & Memory Optimization](#supported-features)
-  * [Inference Acceleration](#supported-features)
-  * [Long Context](#supported-features)
-  * [Model Customization](#supported-features)
-  * [Multimodal](#supported-features)
-
-* [Support](#support)
-* [License](#license)
-* [Citation](#citation)
-
 ## Quick Start
 
 ### Setup
 
-Our package has been fully tested on Linux OS (Ubuntu 20.04). Other OS platforms (MacOS, Windows) are not fully tested.
-You may encounter some unexpected errors. You may try it first on a Linux machine or use Google Colab to experience it.
-
 ```bash
-git clone -b v0.0.5 https://github.com/OptimalScale/LMFlow.git
+git clone -b raft_dev https://github.com/OptimalScale/LMFlow.git
 cd LMFlow
 conda create -n lmflow python=3.9 -y
 conda activate lmflow
@@ -94,141 +44,58 @@ conda install mpi4py
 ```
 
 ### Prepare Dataset
+We have prepared the HH-RLHF dataset and preprocess it into SFT, RM, and RLHF datasets. 
 
-Please refer to our [doc](https://optimalscale.github.io/LMFlow/examples/DATASETS.html).
-
-### Finetuning (Full)
-Full training updates all the parameters to finetune a language model.
-Here is an example to finetune a GPT-2 base model
-```sh
-cd data && ./download.sh alpaca && cd -
-
-./scripts/run_finetune.sh \
-  --model_name_or_path gpt2 \
-  --dataset_path data/alpaca/train \
-  --output_model_path output_models/finetuned_gpt2
+```bash
+cd data
+./download.sh hh_rlhf
 ```
 
-### Finetuning (LoRA)
-LoRA is a parameter-efficient finetuning algorithm and is more efficient than full finetuning.
-```sh
-cd data && ./download.sh alpaca && cd -
 
-# Saves lora only
-./scripts/run_finetune_with_lora.sh \
-  --model_name_or_path facebook/galactica-1.3b \
-  --dataset_path data/alpaca/train \
-  --output_lora_path output_models/finetuned_galactica_lora
+## RLHF Pipeline
 
-# Saves lora and merges into original model
-./scripts/run_finetune_with_lora_save_aggregated_weights.sh \
-  --model_name_or_path facebook/galactica-1.3b \
-  --dataset_path data/alpaca/train \
-  --output_model_path output_models/finetuned_galactica
+### 1 SFT
+
+```bash
+./scripts/finetune.sh openlm-research/open_llama_7b ./output_models/sft_open_llama7b ./data/hh_rlhf/sft
 ```
 
-### Inference
-After finetuning, you can run the following command to chat with the model.
-```sh
-./scripts/run_chatbot.sh output_models/finetuned_gpt2
+We skip the reward modeling first and present an overview of the reward modeling later.
+
+### 2 RAFT ALIGNMENT
+
+To run RAFT, we should first modify scripts/run_raft_align.sh including
+- The number of total iterations: raft_num_iteration=20;
+- The base dir of the experiment used to store all the intermediate models and data: base_dir="./LMFlow_RAFT_Dev/output_models/raft_test"
+- The starting checkpoint: sft_model="./output_models/sft_open_llama7b"
+- The reward model used for RLHF: reward_model="/home/xiongwei/LMFlow/output_models/openllama_3b_rm_2sft_full_train_5e-6_1epoch_4x8bs_raw_dataset".
+
+Then, we simply run the following script to iteratively calling
+- Inference: ./scripts/infer_get_samples.sh A B C
+  - parameter A: the model used to collect new data;
+  - parameter B: the global iteration id in \{0, 1, ..., raft_num_iteration\}, please do not modify this parameter;
+  - parameter C: the dir to save the collected dataset.
+- Reward ranking: ./scripts/infer_get_rewards.sh A B C D
+  - parameter A: the collected dataset in the inference stage;
+  - parameter B: the dir to save the filtered dataset;
+  - parameter C: the base dir of the experiment, used to record reward;
+  - parameter D: reward model.
+- Finetuning: ./scripts/finetune.sh A B C
+  - parameter A: the model to be trained;
+  - parameter B: the dir to save the trained model;
+  - parameter C: the filtered dataset from the reward ranking stage.
+
+```bash
+./scripts/run_raft_align.sh
 ```
 
-### Deployment
-If you want to deploy your own model locally, we provide a gradio-based UI for building chatbots. 
-Running the following command will launch the demo for robin-7b:
-
-```sh
-pip install gradio
-python ./examples/chatbot_gradio.py --deepspeed configs/ds_config_chatbot.json --model_name_or_path YOUR-LLAMA  --lora_model_path ./robin-7b --prompt_structure "A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.###Human: {input_text}###Assistant:"       --end_string "#" --max_new_tokens 200
-```
-We also hosted it on Hugging Face [Space](https://huggingface.co/spaces/OptimalScale/Robin-7b).
-
-
-### Evaluation
-[LMFlow Benchmark](https://blog.gopenai.com/lmflow-benchmark-an-automatic-evaluation-framework-for-open-source-llms-ef5c6f142418) is an automatic evaluation framework for open-source large language models.
-We use negative log likelihood (NLL) as the metric to evaluate different aspects of a language model: chitchat, commonsense reasoning, and instruction following abilities.
-
-You can directly run the LMFlow benchmark evaluation to obtain the results to participate in the
-[LLM comparision](https://docs.google.com/spreadsheets/d/1JYh4_pxNzmNA9I0YM2epgRA7VXBIeIGS64gPJBg5NHA/edit?usp=sharing).
-For example, to run GPT2 XL, one may execute
-```sh
-./scripts/run_benchmark.sh --model_name_or_path gpt2-xl
-```
-`--model_name_or_path` is required, you may fill in huggingface model name or local model path here.
-
-To check the evaluation results, you may check `benchmark.log` in `./output_dir/gpt2-xl_lmflow_chat_nll_eval`,
-`./output_dir/gpt2-xl_all_nll_eval` and `./output_dir/gpt2-xl_commonsense_qa_eval`.
-
-## Supported Features
-
-<details> <summary>Finetune Acceleration & Memory Optimization</summary>
-
-* LoRA
-  
-  LoRA is a parameter-efficient finetuning algorithm and is more efficient than full finetuning. Check out [finetuning-lora](#finetuning-lora) for more details.
-
-* FlashAttention
-
-  LMFlow supports both FlashAttention-1 and the latest FlashAttention-2. Check out [flash_attention](https://github.com/OptimalScale/LMFlow/blob/main/readme/flash_attn2.md) for more details.
-
-* Gradient Checkpointing
-  
-  [Gradient checkpointing](https://github.com/cybertronai/gradient-checkpointing) is a memory optimization technique that trades compute for memory. 
-  It is useful when the model is too large to fit into GPU memory. 
-  Use it by just adding `--gradient_checkpointing` to your training command.
-
-* Deepspeed Zero3
-  
-  LMFlow supports [Deepspeed Zero-3 Offload](https://www.deepspeed.ai/2021/03/07/zero3-offload.html). 
-  We provide an example [deepspeed config](https://github.com/OptimalScale/LMFlow/blob/main/configs/ds_config_zero3.json), and you can directly use it.
-
-</details>
-
-
-<details> <summary>Inference Acceleration</summary>
-
-
-* LLaMA Inference on CPU
-
-  Thanks to the great efforts of [llama.cpp](https://github.com/ggerganov/llama.cpp). It is possible for everyone to run their LLaMA models on CPU by 4-bit quantization. We provide a script to convert LLaMA LoRA weights to `.pt` files. You only need to use `convert-pth-to-ggml.py` in llama.cpp to perform quantization.
-
-* FlashAttention
-
-  LMFlow supports both FlashAttention-1 and the latest FlashAttention-2. Check out [flash_attention](https://github.com/OptimalScale/LMFlow/blob/main/readme/flash_attn2.md) for more details.
-
-</details>
-
-<details> <summary>Long Context</summary>
-
-* Position Interpolation for LLaMA Models
-
-  Now LMFlow supports the latest Linear & NTK (Neural Kernel theory) scaling techniques for LLaMA models. Check out [postion_interpolation](https://github.com/OptimalScale/LMFlow/blob/main/readme/Position_Interpolation.md) for more details.
-
-</details>
-
-<details> <summary>Model Customization</summary>
-
-
-* Vocabulary Extension
-
-  Now you can train your own sentencepiece tokenizer and merge it with model's origin hf tokenizer. Check out [vocab_extension](https://github.com/OptimalScale/LMFlow/blob/main/scripts/vocab_extension) for more details.
-
-</details>
-
-
-<details> <summary>Multimodal</summary>
-
-* Multimodal Chatbot
-
-  LMFlow supports multimodal inputs of images and texts. Check out our [LMFlow multimodal chatbot](https://github.com/OptimalScale/LMFlow/blob/main/scripts/run_vis_chatbot_gradio_minigpt4.sh).
-  [Online Demo](http://multimodal.lmflow.online) is also provided.
-</details>
+#### 2.1 More hyper-parameters
 
 
 
 ## Support
 
-If you need any help, please submit a Github issue.
+If you need any help, please submit a Github issue or contact me via wx13@illinois.edu
 
 ## License
 The code included in this project is licensed under the [Apache 2.0 license](https://github.com/OptimalScale/LMFlow/blob/main/LICENSE).

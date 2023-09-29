@@ -7,6 +7,9 @@
 This is a sub branch of LMFlow, used to present an implementation of RAFT with separate stages, in the sense that we will implement inference, reward ranking, and finetuning separately, so that as long as you can finetune the model, you might leverage RAFT to align your model.
 
 
+<p align="center" width="100%">
+<img src="assets/raft.png" alt="LMFlow-features" style="width: 100%; min-width: 300px; display: block; margin: auto;">
+</p>
 
 ## Quick Start
 

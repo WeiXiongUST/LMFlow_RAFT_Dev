@@ -117,7 +117,7 @@ class RaftAligner(BaseAligner):
 
         def tokenize(sample):
             sample["input_ids"] = tokenizer.encode(sample["text"])
-            sample['input'] = tokenizer.decode(sample["input_ids"])
+            sample['input'] = sample["text"] #tokenizer.decode(sample["input_ids"])
             return sample
         if self.mode == "raft_get_rewards":
             pass
@@ -180,7 +180,7 @@ class RaftAligner(BaseAligner):
                 input_texts.append(query)
 
                 if (i + 1) % infer_batch_size == 0 or (i+1 == data_size):
-                    print(i, time.time()-start_time)
+                    #print(i, time.time()-start_time)
                     gen_len = np.random.randint(output_min_length, output_max_length)
                     generation_kwargs["max_new_tokens"] = gen_len
                     inputs = tokenizer(input_texts, return_tensors="pt", padding=True).to(training_args.device)
@@ -226,8 +226,7 @@ class RaftAligner(BaseAligner):
                 with open(self.raft_infer_samples_store_dir, 'w', encoding='utf8') as f:
                     json.dump(output_eval_dataset, f, ensure_ascii=False)
 
-                #with open("/home/xiongwei/raft/LMFlow_RAFT_Dev/output_models/raft_test/reward.txt", 'a') as f:
-                    #f.write(str(end_time-start_time) + "\n")
+
 
     def _raft_get_rewards(
         self,
@@ -247,7 +246,7 @@ class RaftAligner(BaseAligner):
         responses = batch_input['output']
         K = len(responses[0])
         data = []
-        
+        all_rewards = []
         for i in range(len(querys)):
             q = querys[i]
             tmp_responses = responses[i]
@@ -262,8 +261,10 @@ class RaftAligner(BaseAligner):
 
             reward_dataset = reward_model.inference(texts_for_reward_dataset)
             rewards = [ sample["value"] for sample in reward_dataset.to_dict()["instances"] ]
+            #(rewards)
             record_reward  = rewards[0]
             reward_eva.append(rewards[0])
+            all_rewards.append(rewards)
 
             # we impose some post-detection and discard the samples with certain criteria.
             for kk in range(K):
@@ -278,6 +279,7 @@ class RaftAligner(BaseAligner):
                 data.append({"text": q + tmp_responses[idx_to_record]})
                 reward_train.append(rewards[idx_to_record])                
 
+        
 
         world_size = int(os.getenv("WORLD_SIZE", "1"))
         all_process_list =[{}] * world_size

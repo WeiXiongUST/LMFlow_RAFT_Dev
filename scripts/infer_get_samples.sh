@@ -8,17 +8,20 @@ project_dir=$(cd "$(dirname $0)"/..; pwd)
 output_dir=${project_dir}/output_models/${exp_id}
 log_dir=${project_dir}/log/${exp_id}
 
+if [ ! -d data/hh_rlhf ]; then
+  cd data && ./download.sh hh_rlhf && cd -
+fi
+
 mkdir -p ${output_dir} ${log_dir}
 
 export PYTHONPATH=.
-deepspeed --include localhost:4,5,6,7 \
-    ${deepspeed_args} \
+deepspeed ${deepspeed_args} \
     examples/raft_align.py \
     --model_name_or_path $1 \
     --mode "raft_get_samples" \
     --iter $2 \
     --raft_infer_set $3 \
-    --dataset_path /home/xiongwei/LMFlow/data/clean_hh_rlhf_uncerrtainty_study/rlhf_train_prompt \
+    --dataset_path ${project_dir}/data/hh_rlhf/rlhf_prompt \
     --raft_batch_size 2048 \
     --output_min_length 127 \
     --output_max_length 129 \

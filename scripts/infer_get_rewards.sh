@@ -11,8 +11,7 @@ log_dir=${project_dir}/log/${exp_id}
 
 mkdir -p ${output_dir} ${log_dir}
 export PYTHONPATH=.
-deepspeed --include localhost:4,5,6,7 \
-    ${deepspeed_args} \
+deepspeed ${deepspeed_args} \
     examples/raft_align.py \
     --model_name_or_path gpt2\
     --raft_infer_set $1 \

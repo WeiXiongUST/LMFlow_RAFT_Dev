@@ -17,14 +17,14 @@ deepspeed ${deepspeed_args} \
     --dataset_path $3 \
     --output_dir $2 --overwrite_output_dir \
     --num_train_epochs 2 \
-    --learning_rate 2e-5 \
+    --learning_rate 1e-5 \
     --block_size 512 \
     --per_device_train_batch_size 6 \
-    --deepspeed configs/ds_config_zero2.json \
+    --deepspeed configs/ds_config_zero3.json \
     --bf16 \
     --run_name ${exp_id} \
     --validation_split_percentage 0 \
-    --logging_steps 5 \
+    --logging_steps 1 \
     --do_train \
     --ddp_timeout 72000 \
     --save_steps 888888 \

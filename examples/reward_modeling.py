@@ -42,9 +42,9 @@ peft_config = LoraConfig(
     lora_dropout=0.1,
 )
 # trust_remote_code=True if you want to use chatglm
-model = AutoModelForSequenceClassification.from_pretrained(model_args.model_name_or_path, num_labels=1, torch_dtype=torch.bfloat16)
-model_lora = get_peft_model(model, peft_config)
-model_lora.print_trainable_parameters()
+model_lora = AutoModelForSequenceClassification.from_pretrained(model_args.model_name_or_path, num_labels=1, torch_dtype=torch.bfloat16)
+#model_lora = get_peft_model(model_lora, peft_config)
+#model_lora.print_trainable_parameters()
 
 ## Get tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)

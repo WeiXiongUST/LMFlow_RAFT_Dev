@@ -48,19 +48,8 @@ model_lora = AutoModelForSequenceClassification.from_pretrained(model_args.model
 
 ## Get tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
-
-if "llama" in model_args.model_name_or_path:
-    tokenizer.add_special_tokens(
-        {
-            "eos_token": "[PAD]",
-            "bos_token": "</s>",
-            "unk_token": "</s>",
-            "pad_token": "</s>",
-        }
-    )
-else:
-    tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.pad_token_id = tokenizer.eos_token_id
+tokenizer.pad_token = tokenizer.eos_token
+tokenizer.pad_token_id = tokenizer.eos_token_id
 
 # We also need to add a pad_token for the model. Otherwise, the reward model cannot handle a batch of inputs
 model_lora.config.pad_token_id = tokenizer.eos_token_id
@@ -133,7 +122,8 @@ class RMTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
         chosen_rewards = model(input_ids=inputs["chosen_input_ids"], attention_mask=inputs["chosen_attention_mask"])[0]
         rejected_rewards = model(input_ids=inputs["rejected_input_ids"], attention_mask=inputs["rejected_attention_mask"])[0]
-        loss = -nn.functional.logsigmoid(chosen_rewards - rejected_rewards).mean()
+        loss = -nn.functional.logsigmoid(chosen_rewards - rejected_rewards).mean()- nn.functional.logsigmoid(5.0 - chosen_rewards).mean() - nn.functional.logsigmoid(5.0 + rejected_rewards).mean()
+
         if return_outputs:
             return loss, {"chosen_rewards": chosen_rewards, "rejected_rewards": rejected_rewards}
         return loss

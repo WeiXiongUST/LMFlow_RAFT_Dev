@@ -16,7 +16,7 @@ This is a sub branch of LMFlow, used to present an implementation of RAFT with s
 ### Setup
 
 ```bash
-git clone -b raft_dev https://github.com/OptimalScale/LMFlow.git
+git clone -b raft_dev https://github.com/WeiXiongUST/LMFlow_RAFT_Dev.git
 cd LMFlow
 conda create -n lmflow python=3.9 -y
 conda activate lmflow
@@ -30,7 +30,7 @@ For all the scripts, you may need to run the following command before you run it
 chmod u+x Address_of_script
 ```
 
-If you want to develop the code by yourself, you can visit ./src/lmflow/pipeline/raft_aligner.py.
+If you want to develop the code by yourself, you can visit ./src/lmflow/pipeline/raft_aligner.py. Moreover, you should setup your wandb account first before runing any tuning scripts.
 
 ### Prepare Dataset
 We have prepared the HH-RLHF dataset and preprocess it into SFT, RM, and RLHF datasets. You can download them by running 

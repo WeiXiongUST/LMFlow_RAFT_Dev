@@ -186,10 +186,15 @@ class RaftAligner(BaseAligner):
                     inputs = tokenizer(input_texts, return_tensors="pt", padding=True).to(training_args.device)
                     with torch.no_grad():
                         outputs = model.generate(**inputs, **generation_kwargs)
-                    generated_texts = tokenizer.batch_decode(outputs, skip_special_tokens=True)
-                    generated_texts = [
-                        generated_text.replace(input_texts[i], "") for i, generated_text in enumerate(generated_texts)
-                    ]
+                    generated_texts = [] 
+                    output_ids = outputs
+                    input_ids = inputs['input_ids']
+                    for j, output in enumerate(output_ids):
+                        prompt_length = len(input_ids[j])
+                        tmp_generated_tensor = output[prompt_length:]
+                        tmp_generated_text = tokenizer.decode(tmp_generated_tensor, skip_special_tokens=True)
+                        generated_texts.append(tmp_generated_text)
+
                     generated_texts = [
                         self._clean_text(generated_text) for generated_text in generated_texts
                     ]
